@@ -7,7 +7,7 @@ import org.springframework.web.service.annotation.GetExchange;
 
 import groovy.util.logging.Slf4j;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import io.github.resilience-4j.retry.annotation.Retry;
+import io.github.resilience4j.retry.annotation.Retry;
 
 @Slf4j
 public interface InventoryClient {
