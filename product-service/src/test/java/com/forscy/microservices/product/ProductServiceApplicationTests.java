@@ -1,27 +1,28 @@
 package com.forscy.microservices.product;
 
-import com.forscy.microservices.product.dto.ProductRequest;
-import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.context.annotation.Import;
 import org.testcontainers.containers.MongoDBContainer;
 
-import java.math.BigDecimal;
+import io.restassured.RestAssured;
 
+@Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ProductServiceApplicationTests {
 
 	@ServiceConnection
-	static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0.7");
+	static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:7.0.5");
+
 	@LocalServerPort
-	private Integer port;
+	private int port;
 
 	@BeforeEach
-	void setup() {
+	void setUp() {
 		RestAssured.baseURI = "http://localhost";
 		RestAssured.port = port;
 	}
@@ -31,25 +32,26 @@ class ProductServiceApplicationTests {
 	}
 
 	@Test
-	void shouldCreateProduct() throws Exception {
-		ProductRequest productRequest = getProductRequest();
+	void shouldCreateProduct() {
+		String requestBody = """
+				{
+					"name": "IPhone 15",
+					"description": "IPhone 15 is a smartphone from Apple",
+					"price": 1000
+				}
+				""";
 
 		RestAssured.given()
 				.contentType("application/json")
-				.body(productRequest)
+				.body(requestBody)
 				.when()
 				.post("/api/product")
 				.then()
-				.log().all()
 				.statusCode(201)
 				.body("id", Matchers.notNullValue())
-				.body("name", Matchers.equalTo(productRequest.getName()))
-				.body("description", Matchers.equalTo(productRequest.getDescription()))
-				.body("price", Matchers.is(productRequest.getPrice().intValueExact()));
-	}
-
-	private ProductRequest getProductRequest() {
-		return new ProductRequest("iPhone 13", "iPhone 13", BigDecimal.valueOf(1200));
+				.body("name", Matchers.equalTo("IPhone 15"))
+				.body("description", Matchers.equalTo("IPhone 15 is a smartphone from Apple"))
+				.body("price", Matchers.equalTo(1000));
 	}
 
 }

@@ -2,6 +2,8 @@ package com.forscy.microservices.product;
 
 import org.springframework.boot.SpringApplication;
 
+import com.forscy.microservices.product.ProductServiceApplication;
+
 public class TestProductServiceApplication {
 
 	public static void main(String[] args) {

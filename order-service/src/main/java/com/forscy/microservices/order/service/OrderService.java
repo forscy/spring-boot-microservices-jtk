@@ -1,26 +1,40 @@
 package com.forscy.microservices.order.service;
 
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
+import com.forscy.microservices.order.client.InventoryClient;
 import com.forscy.microservices.order.dto.OrderRequest;
 import com.forscy.microservices.order.model.Order;
 import com.forscy.microservices.order.repository.OrderRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final InventoryClient inventoryClient;
 
     public void placeOrder(OrderRequest orderRequest) {
 
-        Order order = new Order();
-        order.setOrderNumber(UUID.randomUUID().toString());
-        order.setPrice(orderRequest.price());
-        order.setSkuCode(orderRequest.skuCode());
-        order.setQuantity(orderRequest.quantity());
-        orderRepository.save(order);
+        var isProductInStock = inventoryClient.isInStock(orderRequest.skuCode(), orderRequest.quantity());
 
+        if (isProductInStock) {
+            // map OrderRequest to Order Object
+            Order order = new Order();
+            order.setOrderNumber(UUID.randomUUID().toString());
+            order.setSkuCode(orderRequest.skuCode());
+            order.setPrice(orderRequest.price());
+            order.setQuantity(orderRequest.quantity());
+
+            // save Order object to Order Repository
+            orderRepository.save(order);
+        } else {
+            throw new RuntimeException("Product with SkuCode " + orderRequest.skuCode() + " is not in stock");
+        }
     }
+
 }

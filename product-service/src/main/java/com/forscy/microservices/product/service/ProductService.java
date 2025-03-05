@@ -1,57 +1,41 @@
 package com.forscy.microservices.product.service;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.forscy.microservices.product.dto.ProductRequest;
 import com.forscy.microservices.product.dto.ProductResponse;
 import com.forscy.microservices.product.model.Product;
 import com.forscy.microservices.product.repository.ProductRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ProductService {
-
     private final ProductRepository productRepository;
 
     public ProductResponse createProduct(ProductRequest productRequest) {
-        // Membuat objek Product dari ProductRequest
         Product product = Product.builder()
-                .name(productRequest.getName())
-                .description(productRequest.getDescription())
-                .price(productRequest.getPrice())
+                .name(productRequest.name())
+                .description(productRequest.description())
+                .price(productRequest.price())
                 .build();
+        productRepository.save(product);
+        log.info("Product created succesfully. {}", product);
 
-        // Menyimpan produk ke database
-        Product savedProduct = productRepository.save(product);
-
-        // Mencatat log bahwa produk telah disimpan dengan ID-nya
-        log.info("Product {} is saved", savedProduct.getId());
-
-        // Mengonversi Product ke ProductResponse dan mengembalikannya
-        return mapToProductResponse(savedProduct);
+        return new ProductResponse(product.getId(), product.getName(), product.getDescription(), product.getPrice());
     }
 
     public List<ProductResponse> getAllProducts() {
-        // Mengambil semua produk dari database
-        List<Product> products = productRepository.findAll();
-
-        // Mengonversi setiap Product menjadi ProductResponse dan mengembalikannya
-        return products.stream()
-                .map(this::mapToProductResponse)
+        return productRepository.findAll()
+                .stream()
+                .map(product -> new ProductResponse(product.getId(), product.getName(), product.getDescription(),
+                        product.getPrice()))
                 .toList();
     }
 
-    private ProductResponse mapToProductResponse(Product product) {
-        // Mengonversi Product menjadi ProductResponse
-        return ProductResponse.builder()
-                .id(product.getId())
-                .name(product.getName())
-                .description(product.getDescription())
-                .price(product.getPrice())
-                .build();
-    }
 }

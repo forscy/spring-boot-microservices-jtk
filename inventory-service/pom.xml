@@ -12,7 +12,7 @@
 	<artifactId>inventory-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>inventory-service</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Inventory Service by Roy Aziz Barera - 221524030</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -45,6 +45,17 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-mysql</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-api</artifactId>
+			<version>2.8.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.8.5</version>
 		</dependency>
 
 		<dependency>
